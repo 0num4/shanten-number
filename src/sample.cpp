@@ -4,12 +4,22 @@
 #include <random>
 #include <algorithm>
 #include <chrono>
+#include <iterator>
 #include <utility>
 #include "calsht.hpp"
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-  if (argc != 3) {
+  std::cout << "Hello, World!" << std::endl;
+  std::vector<int> hand = {
+      1, 1, 1, 0, 0, 0, 0, 0, 0, // manzu
+      0, 1, 0, 1, 1, 0, 2, 0, 1, // pinzu
+      0, 0, 0, 0, 0, 0, 0, 0, 0, // souzu
+      1, 0, 1, 0, 3, 0, 0        // jihai
+  };
+
+  if (argc != 3)
+  {
     return 1;
   }
 
@@ -23,7 +33,7 @@ int main(int argc, char* argv[])
   int n = 0;
   double ev = 0;
   std::vector<int> hd(K, 0);
-  std::array<int, 4 * T> wall = {0};
+  std::array<int, 4 * T> wall = {0}; // 136の牌山
   std::array<int, 8> sht = {0};
   std::mt19937 rand(std::random_device{}());
   Calsht calsht;
@@ -32,26 +42,41 @@ int main(int argc, char* argv[])
 
   auto itr = wall.begin();
 
-  for (int i = 0; i < K; ++i) {
+  for (int i = 0; i < K; ++i)
+  {
 #ifdef THREE_PLAYER
-    if (i > 0 && i < 8) continue;
+    if (i > 0 && i < 8)
+      continue;
 #endif
-    for (int j = 0; j < 4; ++j) {
+    for (int j = 0; j < 4; ++j)
+    {
       *itr++ = i;
     }
   }
 
   auto start = std::chrono::system_clock::now();
 
-  for (int i = 0; i < N; ++i) {
+  for (int i = 0; i < N; ++i)
+  {
     std::fill(hd.begin(), hd.end(), 0);
-
-    for (int j = 0; j < M; ++j) {
+    std::cout << "M: " << M << " N: " << N << std::endl;
+    std::cout << "start wall: ";
+    std::copy(wall.begin(), wall.end(), std::ostream_iterator<int>(std::cout, " "));
+    std::cout << std::endl;
+    for (int j = 0; j < M; ++j)
+    {
       n = rand() % (4 * T - j);
       ++hd[wall[n]];
       std::swap(wall[n], wall[4 * T - 1 - j]);
     }
+    std::cout << "end wall: ";
+    std::copy(wall.begin(), wall.end(), std::ostream_iterator<int>(std::cout, " "));
+    // std::cout << std::endl;
+    // std::cout << "hand: ";
+    std::copy(hd.begin(), hd.end(), std::ostream_iterator<int>(std::cout, " "));
+    // std::cout << std::endl;
     auto [num, mode] = calsht(hd, M / 3, 7);
+    std::cout << "shanten: " << num << std::endl;
     ++sht[num];
   }
 
@@ -61,7 +86,8 @@ int main(int argc, char* argv[])
 
   std::cout << "=========================RESULT=========================\n";
 
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 8; i++)
+  {
     std::cout << std::setw(4) << (i - 1) << std::setw(12) << sht[i] << std::setw(12) << 100.0 * sht[i] / N << '\n';
     ev += (i - 1) * sht[i];
   }

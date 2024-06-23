@@ -72,6 +72,7 @@ int main()
     0,0,0,0,0,0,0,0,0,// souzu
     1,0,1,0,3,0,0// jihai
   };
+  // 1m2m3m2p4p5p7p7p9p東西白白白
 
   auto [sht, mode] = calsht(hand, 4, 7);
 
